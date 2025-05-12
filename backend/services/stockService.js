@@ -1,5 +1,5 @@
-const { fetchStockPrices } = require("../utils/stockFetcher");
-const { calculateCorrelation } = require("../utils/statistics");
+import { fetchStockPrices } from "../utils/stocks.js";
+import { calculateCorrelation } from "../utils/statistics.js";
 
 async function computeAverageStockPrice(
   ticker,
@@ -66,4 +66,4 @@ async function computeStockCorrelation(tickerA, tickerB, minutes) {
   };
 }
 
-module.exports = { computeAverageStockPrice, computeStockCorrelation };
+export { computeAverageStockPrice, computeStockCorrelation };

@@ -1,8 +1,7 @@
-const express = require("express");
+import express from "express";
+import stockRoutes from "./routes/stockRoutes.js";
+
 const app = express();
-
-const stockRoutes = require("./routes/stockRoutes");
-
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());

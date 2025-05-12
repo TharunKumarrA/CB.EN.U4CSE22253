@@ -1,6 +1,5 @@
-import { TEST_SERVER_BASE_URL } from "./consts";
-
-const axios = require("axios");
+import { TEST_SERVER_BASE_URL } from "./consts.js";
+import axios from "axios";
 
 let cachedToken = null;
 let tokenFetchTime = null;
@@ -8,10 +7,10 @@ let tokenFetchTime = null;
 const tokenValidityDuration = 15 * 60 * 1000;
 
 const getAuthToken = async () => {
-  const isTokenVaild =
+  const isTokenValid =
     cachedToken && Date.now() - tokenFetchTime < tokenValidityDuration;
 
-  if (isTokenVaild) {
+  if (isTokenValid) {
     return cachedToken;
   }
 
@@ -28,9 +27,11 @@ const getAuthToken = async () => {
     `${TEST_SERVER_BASE_URL}/auth`,
     authPayload
   );
+
   cachedToken = response.data.access_token;
-  tokenFetchedAt = Date.now();
+  tokenFetchTime = Date.now();
+
   return cachedToken;
 };
 
-modeule.exports = { getAuthToken };
+export { getAuthToken };

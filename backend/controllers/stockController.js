@@ -1,7 +1,7 @@
-const {
+import {
   computeAverageStockPrice,
   computeStockCorrelation,
-} = require("../services/stockService");
+} from "../services/stockService.js";
 
 const getAverageStockPrice = async (req, res) => {
   try {
@@ -72,4 +72,4 @@ const getStockCorrelation = async (req, res) => {
   }
 };
 
-module.exports = { getAverageStockPrice, getStockCorrelation };
+export { getAverageStockPrice, getStockCorrelation };

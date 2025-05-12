@@ -1,12 +1,13 @@
-const express = require("express");
-const router = express.Router();
-const {
+import express from "express";
+import {
   getAverageStockPrice,
   getStockCorrelation,
-} = require("../controllers/stockController");
+} from "../controllers/stockController.js";
+
+const router = express.Router();
 
 router.get("/stocks/:ticker", getAverageStockPrice);
 
 router.get("/stocks/correlation", getStockCorrelation);
 
-module.exports = router;
+export default router;

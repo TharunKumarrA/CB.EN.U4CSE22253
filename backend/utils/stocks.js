@@ -1,7 +1,6 @@
-import { TEST_SERVER_BASE_URL } from "./consts";
-
-const axios = require("axios");
-const { getAuthToken } = require("./auth");
+import axios from "axios";
+import { TEST_SERVER_BASE_URL } from "./consts.js";
+import { getAuthToken } from "./auth.js";
 
 const fetchStockPrices = async (ticker, minutes) => {
   const token = await getAuthToken();
@@ -16,4 +15,4 @@ const fetchStockPrices = async (ticker, minutes) => {
   return response.data;
 };
 
-module.exports = { fetchStockPrices };
+export { fetchStockPrices };
