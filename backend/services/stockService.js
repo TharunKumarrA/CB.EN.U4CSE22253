@@ -1,4 +1,5 @@
 const { fetchStockPrices } = require("../utils/stockFetcher");
+const { calculateCorrelation } = require("../utils/statistics");
 
 async function computeAverageStockPrice(
   ticker,
@@ -31,4 +32,38 @@ async function computeAverageStockPrice(
   throw new Error("Unsupported aggregation type");
 }
 
-module.exports = { computeAverageStockPrice };
+async function computeStockCorrelation(tickerA, tickerB, minutes) {
+  const [dataA, dataB] = await Promise.all([
+    fetchStockPrices(tickerA, minutes),
+    fetchStockPrices(tickerB, minutes),
+  ]);
+
+  const pricesA = dataA.map((p) => p.price);
+  const pricesB = dataB.map((p) => p.price);
+
+  const correlation = calculateCorrelation(pricesA, pricesB);
+
+  return {
+    correlation,
+    stocks: {
+      [tickerA]: {
+        averagePrice: Number(
+          (
+            pricesA.reduce((sum, price) => sum + price, 0) / pricesA.length
+          ).toFixed(6)
+        ),
+        priceHistory: dataA,
+      },
+      [tickerB]: {
+        averagePrice: Number(
+          (
+            pricesB.reduce((sum, price) => sum + price, 0) / pricesB.length
+          ).toFixed(6)
+        ),
+        priceHistory: dataB,
+      },
+    },
+  };
+}
+
+module.exports = { computeAverageStockPrice, computeStockCorrelation };
