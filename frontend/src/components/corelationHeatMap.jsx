@@ -2,30 +2,22 @@ import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
-  Grid,
   Box,
-  Select,
-  MenuItem,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
+  Button,
 } from "@mui/material";
 import { stockService } from "../services/stockService";
 
-// Utility function to get correlation color
-const getCorrelationColor = (correlation) => {
-  if (correlation > 0.7) return "darkgreen";
-  if (correlation > 0.3) return "lightgreen";
-  if (correlation > -0.3) return "gray";
-  if (correlation > -0.7) return "pink";
-  return "red";
-};
-
-const CorrelationHeatmap = () => {
+const CorrelationWidget = () => {
   const [minutes, setMinutes] = useState(50);
-  const [correlationData, setCorrelationData] = useState(null);
+  const [t1, setT1] = useState("NVDA");
+  const [t2, setT2] = useState("AAPL");
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Predefined set of tickers
   const tickers = [
     "NVDA",
     "PYPL",
@@ -38,114 +30,84 @@ const CorrelationHeatmap = () => {
     "AMD",
     "BRKB",
   ];
-
   const minutesOptions = [10, 30, 50, 60, 120];
 
-  useEffect(() => {
-    const fetchCorrelations = async () => {
-      setLoading(true);
-      try {
-        // Generate all possible ticker pairs
-        const correlationPromises = [];
-        for (let i = 0; i < tickers.length; i++) {
-          for (let j = i + 1; j < tickers.length; j++) {
-            correlationPromises.push(
-              stockService.getStockCorrelation(
-                [tickers[i], tickers[j]],
-                minutes
-              )
-            );
-          }
-        }
-
-        const results = await Promise.all(correlationPromises);
-        setCorrelationData(results);
-      } catch (error) {
-        console.error("Error fetching correlations:", error);
-      }
-      setLoading(false);
-    };
-
-    fetchCorrelations();
-  }, [minutes]);
+  const fetchCorrelation = async () => {
+    setLoading(true);
+    try {
+      const data = await stockService.getStockCorrelation([t1, t2], minutes);
+      setResult(data);
+    } catch (e) {
+      console.error(e);
+    }
+    setLoading(false);
+  };
 
   return (
-    <Container maxWidth="lg">
-      <Typography variant="h4" gutterBottom>
-        Stock Correlation Heatmap
-      </Typography>
-
-      <Box mb={2}>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel>Time Frame (minutes)</InputLabel>
+    <Container>
+      <Typography variant="h5">Pairwise Correlation</Typography>
+      <Box display="flex" gap={2} my={2}>
+        <FormControl>
+          <InputLabel>Stock 1</InputLabel>
           <Select
-            value={minutes}
-            onChange={(e) => setMinutes(e.target.value)}
-            label="Time Frame (minutes)"
+            value={t1}
+            onChange={(e) => setT1(e.target.value)}
+            label="Stock 1"
           >
-            {minutesOptions.map((m) => (
-              <MenuItem key={m} value={m}>
-                {m} minutes
+            {tickers.map((t) => (
+              <MenuItem key={t} value={t}>
+                {t}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+        <FormControl>
+          <InputLabel>Stock 2</InputLabel>
+          <Select
+            value={t2}
+            onChange={(e) => setT2(e.target.value)}
+            label="Stock 2"
+          >
+            {tickers.map((t) => (
+              <MenuItem key={t} value={t}>
+                {t}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <InputLabel>Window</InputLabel>
+          <Select
+            value={minutes}
+            onChange={(e) => setMinutes(e.target.value)}
+            label="Window"
+          >
+            {minutesOptions.map((m) => (
+              <MenuItem key={m} value={m}>
+                {m} min
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          onClick={fetchCorrelation}
+          disabled={loading}
+        >
+          {loading ? "…" : "Compute"}
+        </Button>
       </Box>
 
-      {loading ? (
-        <Typography>Loading...</Typography>
-      ) : correlationData ? (
-        <Grid container spacing={1}>
-          {tickers.map((rowTicker, rowIndex) => (
-            <Grid key={rowTicker} container item xs={12} spacing={1}>
-              {tickers.map((colTicker, colIndex) => {
-                // Find correlation for this pair
-                let correlation = null;
-                if (rowIndex < colIndex) {
-                  const correlationEntry = correlationData.find(
-                    (entry) =>
-                      (entry.stocks[rowTicker] && entry.stocks[colTicker]) ||
-                      (entry.stocks[colTicker] && entry.stocks[rowTicker])
-                  );
-                  correlation = correlationEntry
-                    ? correlationEntry.correlation
-                    : null;
-                }
-
-                return (
-                  <Grid item xs key={colTicker}>
-                    <Box
-                      sx={{
-                        height: 50,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor:
-                          rowIndex === colIndex
-                            ? "lightgray"
-                            : rowIndex > colIndex
-                            ? getCorrelationColor(correlation)
-                            : "white",
-                        border: "1px solid #ddd",
-                      }}
-                    >
-                      {rowIndex === colIndex
-                        ? rowTicker
-                        : rowIndex > colIndex
-                        ? correlation?.toFixed(2)
-                        : ""}
-                    </Box>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <Typography>No correlation data available</Typography>
+      {result && (
+        <Box mt={2}>
+          <Typography>
+            Correlation between {t1} and {t2} over {minutes} minutes:{" "}
+            <strong>{result.correlation.toFixed(4)}</strong>
+          </Typography>
+        </Box>
       )}
     </Container>
   );
 };
 
-export default CorrelationHeatmap;
+export default CorrelationWidget;

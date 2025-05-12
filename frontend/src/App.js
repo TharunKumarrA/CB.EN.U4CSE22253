@@ -9,7 +9,7 @@ import {
   Box,
 } from "@mui/material";
 import StockPage from "./components/StockPage";
-import CorrelationHeatmap from "./components/corelationHeatMap";
+import CorrelationWidget from "./components/corelationHeatMap";
 
 function App() {
   const [value, setValue] = useState(0);
@@ -35,7 +35,7 @@ function App() {
         </Box>
 
         {value === 0 && <StockPage />}
-        {value === 1 && <CorrelationHeatmap />}
+        {value === 1 && <CorrelationWidget />}
       </Container>
     </div>
   );

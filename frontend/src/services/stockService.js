@@ -17,9 +17,9 @@ export const stockService = {
 
   async getStockCorrelation(tickers, minutes = 50) {
     try {
-      const response = await axios.get(`${BASE_URL}/stockcorrelation`, {
+      const response = await axios.get(`${BASE_URL}/stocks/stockcorrelation`, {
         params: {
-          ticker: tickers,
+          tickers,
           minutes,
         },
       });

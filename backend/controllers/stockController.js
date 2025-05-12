@@ -14,7 +14,7 @@ const getAverageStockPrice = async (req, res) => {
 
     const { averagePrice, priceHistory } = await computeAverageStockPrice(
       ticker,
-      minutes,
+      Number(minutes),
       aggregation
     );
 
@@ -33,31 +33,30 @@ const getAverageStockPrice = async (req, res) => {
 
 const getStockCorrelation = async (req, res) => {
   try {
-    const { minutes = 50 } = req.query;
-    const { tickers } = req.query;
+    const { minutes = 50, ticker } = req.query;
 
-    if (!tickers || !Array.isArray(tickers) || tickers.length !== 2) {
+    if (!ticker || !Array.isArray(ticker) || ticker.length !== 2) {
       return res
         .status(400)
         .json({ message: "Exactly two ticker symbols are required" });
     }
 
     const result = await computeStockCorrelation(
-      tickers[0],
-      tickers[1],
-      minutes
+      ticker[0],
+      ticker[1],
+      Number(minutes)
     );
 
     const correlationResponse = {
       correlation: result.correlation.toFixed(4),
       stocks: {
-        [tickers[0]]: {
-          averagePrice: result.stocks[tickers[0]].averagePrice,
-          priceHistory: result.stocks[tickers[0]].priceHistory,
+        [ticker[0]]: {
+          averagePrice: result.stocks[ticker[0]].averagePrice,
+          priceHistory: result.stocks[ticker[0]].priceHistory,
         },
-        [tickers[1]]: {
-          averagePrice: result.stocks[tickers[1]].averagePrice,
-          priceHistory: result.stocks[tickers[1]].priceHistory,
+        [ticker[1]]: {
+          averagePrice: result.stocks[ticker[1]].averagePrice,
+          priceHistory: result.stocks[ticker[1]].priceHistory,
         },
       },
     };

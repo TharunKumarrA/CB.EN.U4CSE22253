@@ -4,7 +4,7 @@ import axios from "axios";
 let cachedToken = null;
 let tokenFetchTime = null;
 
-const tokenValidityDuration = 15 * 60 * 1000;
+const tokenValidityDuration = 2 * 60 * 1000;
 
 const getAuthToken = async () => {
   const isTokenValid =

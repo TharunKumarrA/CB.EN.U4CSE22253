@@ -8,6 +8,6 @@ const router = express.Router();
 
 router.get("/stocks/:ticker", getAverageStockPrice);
 
-router.get("/stocks/correlation", getStockCorrelation);
+router.get("/stockcorrelation", getStockCorrelation);
 
 export default router;
